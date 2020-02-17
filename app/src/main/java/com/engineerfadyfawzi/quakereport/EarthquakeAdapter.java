@@ -1,7 +1,9 @@
 package com.engineerfadyfawzi.quakereport;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,7 +60,7 @@ public class EarthquakeAdapter extends ArrayAdapter< Earthquake >
         }
         
         // Find the earthquake at the given position in the list of earthquakes
-        Earthquake currentEarthquake = getItem( position );
+        final Earthquake currentEarthquake = getItem( position );
         
         // Find the TextView with view ID magnitude
         TextView magnitudeView = listItemView.findViewById( R.id.magnitude );
@@ -133,6 +135,24 @@ public class EarthquakeAdapter extends ArrayAdapter< Earthquake >
         String formattedTime = formatTime( dateObject );
         // Display the time of the current earthquake in the TextView
         timeView.setText( formattedTime );
+        
+        // Set a click listener on the ListView, which sends an intent to a web browser
+        // to open a website with more information about the selected earthquake
+        listItemView.setOnClickListener( new View.OnClickListener()
+        {
+            @Override
+            public void onClick( View view )
+            {
+                // Convert the String URL into a URI object (to pass into the Intent constructor)
+                Uri earthquakeUri = Uri.parse( currentEarthquake.getUrl() );
+                
+                // Create a new intent to view the earthquake URI
+                Intent websiteIntent = new Intent( Intent.ACTION_VIEW, earthquakeUri );
+                
+                // Send the intent to launch a new activity
+                getContext().startActivity( websiteIntent );
+            }
+        } );
         
         // Return the list item view that is now showing the appropriate data
         return listItemView;
