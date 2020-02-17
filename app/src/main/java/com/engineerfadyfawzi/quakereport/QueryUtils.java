@@ -67,12 +67,12 @@ public class QueryUtils
             for ( int i = 0; i < earthquakeArray.length(); i++ )
             {
                 // Get a single earthquake at position i within the list of earthquakes
-                JSONObject currentEarthqauke = earthquakeArray.getJSONObject( i );
+                JSONObject currentEarthquake = earthquakeArray.getJSONObject( i );
                 
                 // For a given earthquake, extract the JSONObject associated with the
                 // key called "properties", which represents a list of all properties
                 // for that earthquake.
-                JSONObject properties = currentEarthqauke.getJSONObject( "properties" );
+                JSONObject properties = currentEarthquake.getJSONObject( "properties" );
                 
                 // Extract the value for the key called "mag"
                 String magnitude = properties.getString( "mag" );
