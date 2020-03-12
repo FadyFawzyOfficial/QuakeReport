@@ -1,6 +1,7 @@
 package com.engineerfadyfawzi.quakereport;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.util.List;
 
@@ -48,6 +49,8 @@ public class EarthquakeLoader extends AsyncTaskLoader< List< Earthquake > >
     @Override
     protected void onStartLoading()
     {
+        Log.i( LOG_TAG, "TEST: onStartLoading() called ..." );
+        
         forceLoad();
     }
     
@@ -59,6 +62,8 @@ public class EarthquakeLoader extends AsyncTaskLoader< List< Earthquake > >
     @Override
     public List< Earthquake > loadInBackground()
     {
+        Log.i( LOG_TAG, "TEST: loadInBackground() called ..." );
+        
         // Don't perform the request if the URL is null and return early
         if ( mUrl == null )
             return null;
