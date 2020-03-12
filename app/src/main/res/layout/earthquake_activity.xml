@@ -1,12 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Layout for a list of earthquakes -->
-<ListView
+<!-- The relative layout is here since we will be showing either the empty view or the list view. -->
+<!-- We add a parent RelativeLayout, because it allows children views to overlap each other. -->
+<RelativeLayout
 	xmlns:android = "http://schemas.android.com/apk/res/android"
 	xmlns:tools = "http://schemas.android.com/tools"
-	android:id = "@+id/list_view"
 	android:layout_width = "match_parent"
 	android:layout_height = "match_parent"
-	android:divider = "@null"
-	android:dividerHeight = "0dp"
-	android:orientation = "vertical"
-	tools:context = ".EarthquakeActivity" />
+	tools:context = ".EarthquakeActivity">
+	
+	<!-- Here is the list. -->
+	<ListView
+		android:id = "@+id/list_view"
+		android:layout_width = "match_parent"
+		android:layout_height = "match_parent"
+		android:divider = "@null"
+		android:dividerHeight = "0dp"
+		android:orientation = "vertical" />
+	
+	<!-- Here is the view to show if the list is empty. -->
+	<!-- Empty view is only visible when the list has no items. -->
+	<TextView
+		android:id = "@+id/empty_view"
+		android:layout_width = "wrap_content"
+		android:layout_height = "wrap_content"
+		android:layout_centerInParent = "true"
+		android:textAppearance = "?android:textAppearanceMedium" />
+
+</RelativeLayout>
