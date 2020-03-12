@@ -46,6 +46,8 @@ public class QueryUtils
      */
     public static List< Earthquake > fetchEarthquakeData( String stringUrl )
     {
+        Log.i( LOG_TAG, "TEST: fetchEarthquakeData() called ..." );
+        
         // Create URL objcet
         URL url = createUrl( stringUrl );
         

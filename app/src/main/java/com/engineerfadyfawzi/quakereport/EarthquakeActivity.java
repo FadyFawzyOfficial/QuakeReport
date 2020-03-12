@@ -8,6 +8,7 @@ import androidx.loader.content.Loader;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -43,6 +44,8 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
     @Override
     protected void onCreate( Bundle savedInstanceState )
     {
+        Log.i( LOG_TAG, "TEST: Earthquake Activity onCreate() called" );
+        
         super.onCreate( savedInstanceState );
         setContentView( R.layout.earthquake_activity );
         
@@ -83,6 +86,7 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
         // Initialize the loader. Pass in the int ID constant defined above and pass in null for
         // the bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
         // because this activity implements the LoaderCallbacks interface).
+        Log.i( LOG_TAG, "TEST: calling initLoader() ..." );
         loaderManager.initLoader( EARTHQUAKE_LOADER_ID, null, this );
     }
     
@@ -97,6 +101,8 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
     @Override
     public Loader< List< Earthquake > > onCreateLoader( int id, Bundle args )
     {
+        Log.i( LOG_TAG, "TEST: onCreateLoader() called ..." );
+        
         // COMPLETED: Create a new loader for the given URL
         return new EarthquakeLoader( this, USGS_REQUEST_URL );
     }
@@ -111,6 +117,8 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
     @Override
     public void onLoadFinished( Loader< List< Earthquake > > loader, List< Earthquake > earthquakes )
     {
+        Log.i( LOG_TAG, "TEST: onLoadFinished() called ..." );
+        
         // COMPLETED: Update the UI with the result
         // Clear the adapter of previous earthquake data
         mAdapter.clear();
@@ -132,6 +140,8 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
     @Override
     public void onLoaderReset( Loader< List< Earthquake > > loader )
     {
+        Log.i( LOG_TAG, "TEST: onLoaderReset() called ..." );
+        
         // COMPLETED: Loader reset, so we can clear out our existing data.
         // Clear the adapter of previous earthquake data
         mAdapter.clear();

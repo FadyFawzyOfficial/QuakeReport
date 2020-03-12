@@ -1,6 +1,7 @@
 package com.engineerfadyfawzi.quakereport;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.util.List;
 
@@ -28,6 +29,11 @@ public class EarthquakeLoader extends AsyncTaskLoader< List< Earthquake > >
      */
     private String mUrl;
     
+    /**
+     * List of earthquakes that return from another thread.
+     */
+    private List< Earthquake > earthquakes;
+    
     
     /**
      * Constructors a new {@link EarthquakeLoader}.
@@ -42,13 +48,22 @@ public class EarthquakeLoader extends AsyncTaskLoader< List< Earthquake > >
     }
     
     /**
-     * Important: Notice that we also override the onStartLoading() method to call forceLoad() which
-     * is a required step to actually trigger the loadInBackground() method to execute.
+     * Important: Notice that we also override the onStartLoading() method to call forceLoad()
+     * which is a required step to actually trigger the loadInBackground() method to execute.
+     *
+     * I implicitly you can utilize this method to stop calling loadInBackground() unnecessarily by
+     * using deliverResult() method which delivers the result of the previous load to the registered
+     * listener's onLoadFinished() method which in turn allows us to skip loadInBackground() call.
      */
     @Override
     protected void onStartLoading()
     {
-        forceLoad();
+        Log.i( LOG_TAG, "TEST: onStartLoading() called ..." );
+        
+        if ( earthquakes != null )
+            deliverResult( earthquakes ); // skip loadInBackground() call
+        else
+            forceLoad(); // call loadInBackground()
     }
     
     /**
@@ -59,6 +74,8 @@ public class EarthquakeLoader extends AsyncTaskLoader< List< Earthquake > >
     @Override
     public List< Earthquake > loadInBackground()
     {
+        Log.i( LOG_TAG, "TEST: loadInBackground() called ..." );
+        
         // Don't perform the request if the URL is null and return early
         if ( mUrl == null )
             return null;
@@ -67,7 +84,7 @@ public class EarthquakeLoader extends AsyncTaskLoader< List< Earthquake > >
         
         // Preform the HTTP request for earthquake data and process the response.
         // Get the list of earthquakes from {@link QueryUtils}'s fetchEarthquakeData method.
-        List< Earthquake > earthquakes = QueryUtils.fetchEarthquakeData( mUrl );
+        earthquakes = QueryUtils.fetchEarthquakeData( mUrl );
         
         // Return the list of {@link Earthquake}s objects as the result of the {@link EarthquakeLoader}
         return earthquakes;
