@@ -39,7 +39,7 @@ public class QueryUtils
     }
     
     /**
-     * Query the USGS data set and return a list of {@link Earthquake} objcets.
+     * Query the USGS data set and return a list of {@link Earthquake} objects.
      *
      * @param stringUrl
      * @return
@@ -47,28 +47,6 @@ public class QueryUtils
     public static List< Earthquake > fetchEarthquakeData( String stringUrl )
     {
         Log.i( LOG_TAG, "TEST: fetchEarthquakeData() called ..." );
-        
-        // Test #1: Force the background thread to sleep for 2 seconds
-        
-        /*
-        To force the background thread to sleep for 2 seconds, we are temporarily simulating a very
-        slow network response time. We are “pretending” that it took a long time to fetch the response.
-        That allows us to see the loading spinner on the screen for a little longer than it normally
-        would appear for.
-        
-        In the QueryUtils.java file, within the fetchEarthquakeData() method, we add this snippet of
-        code at the top of the method. Leave the rest of the code in the method as-is. We are forcing
-        the background thread to pause execution and wait for 2 seconds (which is 2000 milliseconds),
-        before proceeding to execute the rest of lines of code in this method.
-         */
-        try
-        {
-            Thread.sleep( 2000 );
-        }
-        catch ( InterruptedException interruptedException )
-        {
-            interruptedException.printStackTrace();
-        }
         
         // Create URL object
         URL url = createUrl( stringUrl );
