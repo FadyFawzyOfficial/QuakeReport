@@ -134,6 +134,10 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
     {
         Log.i( LOG_TAG, "TEST: onLoadFinished() called ..." );
         
+        // Hide loading indicator because the data has been loaded
+        View loadingSpinner = findViewById( R.id.loading_spinner );
+        loadingSpinner.setVisibility( View.GONE );
+        
         // Set empty state text to display "No earthquakes found."
         mEmptyStateTextView.setText( R.string.no_earthquakes );
         
