@@ -7,6 +7,8 @@ import java.util.List;
 
 import androidx.loader.content.AsyncTaskLoader;
 
+// TODO: To Handle the orientation change and avoiding creating duplicate request follow these steps.
+
 /**
  * To define the EarthquakeLoader class, we extend AsyncTaskLoader and specify List as the generic
  * parameter, which explains what type of data is expected to be loaded. In this case, the loader
@@ -29,6 +31,13 @@ public class EarthquakeLoader extends AsyncTaskLoader< List< Earthquake > >
      */
     private String mUrl;
     
+    // COMPLETED (1): Create a member variable inside AsyncTaskLoader to store the cached result in
+    
+    /**
+     * List of earthquakes that return from background thread.
+     */
+    private List< Earthquake > earthquakes;
+    
     /**
      * Constructors a new {@link EarthquakeLoader}
      *
@@ -44,17 +53,31 @@ public class EarthquakeLoader extends AsyncTaskLoader< List< Earthquake > >
     /**
      * Important: Notice that we also override the onStartLoading() method to call forceLoad()
      * which is a required step to actually trigger the loadInBackground() method to execute.
+     *
+     * I implicitly utilize this method to stop calling loadInBackground() unnecessarily by using
+     * deliverResult() method which delivers the result of the previous load to the registered
+     * listener's onLoadFinished() method which in turn allows us to skip loadInBackground() call.
+     *
+     * Think of this as AsyncTask onPreExecute() method,you can start your progress bar,
+     * and at the end call forceLoad();
      */
     @Override
     protected void onStartLoading()
     {
         Log.i( LOG_TAG, "TEST: onStartLoading() called ..." );
         
-        forceLoad();
+        // COMPLETED (2): Modify onStartLoading to just call deliverResult if the cache isn't null
+        if ( earthquakes != null )
+            deliverResult( earthquakes ); // skip loadInBackground() call
+        else
+            forceLoad(); // call loadInBackground()
     }
     
     /**
      * This is on a background thread.
+     *
+     * Think of this as AsyncTask doInBackground() method, here you will actually initiate Network
+     * call, or any work that need to be done on background
      *
      * @return
      */
@@ -63,7 +86,7 @@ public class EarthquakeLoader extends AsyncTaskLoader< List< Earthquake > >
     {
         Log.i( LOG_TAG, "TEST: loadInBackground() called ..." );
         
-        // Don't perform the request if the URL is null.
+        // Don't perform the request if the URL is null and return early.
         if ( mUrl == null )
             return null;
         
@@ -73,7 +96,17 @@ public class EarthquakeLoader extends AsyncTaskLoader< List< Earthquake > >
         // Get the list of earthquakes from {@link QueryUtils}
         List< Earthquake > earthquakes = QueryUtils.fetchEarthquakeData( mUrl );
         
-        // Return the {@link } objects as the result of the {@link EarthquakeAsyncTask}
+        // Return the list of {@link Earthquake}s object as the result of the {@link EarthquakeLoader}
         return earthquakes;
+    }
+    
+    // COMPLETED (3): Override deliverResult to store the data in our cache member variable
+    @Override
+    public void deliverResult( List< Earthquake > data )
+    {
+        Log.i( LOG_TAG, "TEST: deliverResult() called ..." );
+        
+        earthquakes = data;
+        super.deliverResult( data );
     }
 }
