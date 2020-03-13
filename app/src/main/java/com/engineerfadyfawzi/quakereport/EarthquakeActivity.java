@@ -47,6 +47,11 @@ public class EarthquakeActivity extends AppCompatActivity
      */
     private TextView mEmptyStateTextView;
     
+    /**
+     * ProgressBar that is displayed when the app loading (internet connection is poor).
+     */
+    private View loadingSpinner;
+    
     @Override
     protected void onCreate( Bundle savedInstanceState )
     {
@@ -55,57 +60,7 @@ public class EarthquakeActivity extends AppCompatActivity
         super.onCreate( savedInstanceState );
         setContentView( R.layout.earthquake_activity );
         
-        // Find a reference to the {@link ListView} in the layout
-        ListView earthquakeListView = findViewById( R.id.list_view );
-        
-        // To avoid the “No earthquakes found.” message blinking on the screen when the app first
-        // launches, we can leave the empty state TextView blank, until the first load completes.
-        // In the onLoadFinished callback method, we can set the text to be the string
-        // “No earthquakes found.” It’s okay if this text is set every time the loader finishes
-        // because it’s not too expensive of an operation. There’s always trade offs, and this user
-        // experience is better.
-        mEmptyStateTextView = findViewById( R.id.empty_view );
-        earthquakeListView.setEmptyView( mEmptyStateTextView );
-        
-        // Create a new adapter that takes an empty list of earthquakes as input
-        mAdapter = new EarthquakeAdapter( this, new ArrayList< Earthquake >() );
-        
-        // Set the adapter on the {@link ListView}
-        // so the list can be populated in the user interface
-        earthquakeListView.setAdapter( mAdapter );
-        
-        // Get a reference to the ConnectivityManager to check state of network connectivity
-        ConnectivityManager connectivityManager =
-                ( ConnectivityManager ) getSystemService( Context.CONNECTIVITY_SERVICE );
-    
-        // Get details on the currently active default data network
-        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-        
-        // Check if there is a network connection or not and store the result in boolean variable.
-        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-    
-        // If there is a network connection, featch data
-        if ( isConnected )
-        {
-            // Get a reference to the LoaderManager, in order to interact with loaders.
-            LoaderManager loaderManager = getSupportLoaderManager();
-        
-            // Initialize the loader. Pass in the int ID constant defined above and pass in null for
-            // the bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
-            // because this activity implements the LoaderCallbacks interface).
-            Log.i( LOG_TAG, "TEST: calling initLoader() ..." );
-            loaderManager.initLoader( EARTHQUAKE_LOADER_ID, null, this );
-        }
-        else
-        {
-            // Otherwise, display error
-            // First, hide loading indicator so error message will be visible
-            View loadingSpinner = findViewById( R.id.loading_spinner );
-            loadingSpinner.setVisibility( View.GONE );
-        
-            // Update the empty state with no connection error message
-            mEmptyStateTextView.setText( R.string.no_internet_connection );
-        }
+        getEarthquakeData();
     }
     
     /**
@@ -121,7 +76,7 @@ public class EarthquakeActivity extends AppCompatActivity
     {
         Log.i( LOG_TAG, "TEST: onCreateLoader() called ..." );
         
-        // COMPLETED: Create a new loader for the given URL
+        // Create a new loader for the given URL
         return new EarthquakeLoader( this, USGS_REQUEST_URL );
     }
     
@@ -138,13 +93,17 @@ public class EarthquakeActivity extends AppCompatActivity
         Log.i( LOG_TAG, "TEST: onLoadFinished() called ..." );
         
         // Hide loading indicator because the data has been loaded
-        View loadingSpinner = findViewById( R.id.loading_spinner );
         loadingSpinner.setVisibility( View.GONE );
         
-        // Set empty state text to display "No earthquakes found."
-        mEmptyStateTextView.setText( R.string.no_earthquakes );
+        // Check the internet connection before setText to EmptyStateTextView
+        // to avoid show there no earthquakes instead of no internet while it's really not connected
+        if ( isConnected() )
+            mEmptyStateTextView.setText( R.string.no_earthquakes );
+        else
+            // Set empty state text to display "No earthquakes found."
+            mEmptyStateTextView.setText( R.string.no_internet_connection );
         
-        // COMPLETED: Update the UI with the result
+        // Update the UI with the result
         // Clear the adapter of previous earthquake data
         mAdapter.clear();
         
@@ -167,8 +126,76 @@ public class EarthquakeActivity extends AppCompatActivity
     {
         Log.i( LOG_TAG, "TEST: onLoaderReset() called ..." );
         
-        // COMPLETED: Loader reset, so we can clear out our existing data.
+        // Loader reset, so we can clear out our existing data.
         // Clear the adapter of previous earthquake data
         mAdapter.clear();
+    }
+    
+    /**
+     * Just Organization: By collecting all onCreate statements in this one method
+     */
+    private void getEarthquakeData()
+    {
+        // Find a reference to the {@link ListView} in the layout
+        ListView earthquakeListView = findViewById( R.id.list_view );
+        
+        // initialize and set the value of this global loading spinner
+        loadingSpinner = findViewById( R.id.loading_spinner );
+        
+        // To avoid the “No earthquakes found.” message blinking on the screen when the app first
+        // launches, we can leave the empty state TextView blank, until the first load completes.
+        // In the onLoadFinished callback method, we can set the text to be the string
+        // “No earthquakes found.” It’s okay if this text is set every time the loader finishes
+        // because it’s not too expensive of an operation. There’s always trade offs, and this user
+        // experience is better.
+        mEmptyStateTextView = findViewById( R.id.empty_view );
+        earthquakeListView.setEmptyView( mEmptyStateTextView );
+        
+        // Create a new adapter that takes an empty list of earthquakes as input
+        mAdapter = new EarthquakeAdapter( this, new ArrayList< Earthquake >() );
+        
+        // Set the adapter on the {@link ListView}
+        // so the list can be populated in the user interface
+        earthquakeListView.setAdapter( mAdapter );
+        
+        // If there is a network connection, fetch data
+        if ( isConnected() )
+        {
+            // Get a reference to the LoaderManager, in order to interact with loaders.
+            LoaderManager loaderManager = getSupportLoaderManager();
+            
+            // Initialize the loader. Pass in the int ID constant defined above and pass in null for
+            // the bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
+            // because this activity implements the LoaderCallbacks interface).
+            Log.i( LOG_TAG, "TEST: calling initLoader() ..." );
+            loaderManager.initLoader( EARTHQUAKE_LOADER_ID, null, this );
+        }
+        else
+        {
+            // Otherwise, display error
+            // First, hide loading indicator so error message will be visible
+            loadingSpinner.setVisibility( View.GONE );
+            
+            // Update the empty state with no connection error message
+            mEmptyStateTextView.setText( R.string.no_internet_connection );
+        }
+    }
+    
+    /**
+     * Check if there is a network connection or not.
+     *
+     * @return
+     */
+    private boolean isConnected()
+    {
+        // Get a reference to the ConnectivityManager to check state of network connectivity
+        ConnectivityManager connectivityManager =
+                ( ConnectivityManager ) getSystemService( Context.CONNECTIVITY_SERVICE );
+        
+        // Get details on the currently active default data network
+        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+        
+        // Check if there is a network connection or not and store the result in boolean variable.
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 }
