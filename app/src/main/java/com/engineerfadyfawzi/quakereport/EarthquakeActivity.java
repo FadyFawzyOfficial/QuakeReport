@@ -8,6 +8,7 @@ import androidx.loader.content.Loader;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,11 @@ public class EarthquakeActivity extends AppCompatActivity
      */
     private EarthquakeAdapter mAdapter;
     
+    /**
+     * TextView that is displayed when the list is empty.
+     */
+    private TextView mEmptyStateTextView;
+    
     @Override
     protected void onCreate( Bundle savedInstanceState )
     {
@@ -47,6 +53,15 @@ public class EarthquakeActivity extends AppCompatActivity
         
         // Find a reference to the {@link ListView} in the layout
         ListView earthquakeListView = findViewById( R.id.list_view );
+        
+        // To avoid the “No earthquakes found.” message blinking on the screen when the app first
+        // launches, we can leave the empty state TextView blank, until the first load completes.
+        // In the onLoadFinished callback method, we can set the text to be the string
+        // “No earthquakes found.” It’s okay if this text is set every time the loader finishes
+        // because it’s not too expensive of an operation. There’s always trade offs, and this user
+        // experience is better.
+        mEmptyStateTextView = findViewById( R.id.empty_view );
+        earthquakeListView.setEmptyView( mEmptyStateTextView );
         
         // Create a new adapter that takes an empty list of earthquakes as input
         mAdapter = new EarthquakeAdapter( this, new ArrayList< Earthquake >() );
@@ -93,6 +108,9 @@ public class EarthquakeActivity extends AppCompatActivity
     public void onLoadFinished( Loader< List< Earthquake > > loader, List< Earthquake > earthquakes )
     {
         Log.i( LOG_TAG, "TEST: onLoadFinished() called ..." );
+        
+        // Set empty state text to display "No earthquakes found."
+        mEmptyStateTextView.setText( R.string.no_earthquakes );
         
         // COMPLETED: Update the UI with the result
         // Clear the adapter of previous earthquake data
