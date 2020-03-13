@@ -6,6 +6,7 @@ import androidx.loader.app.LoaderManager.LoaderCallbacks;
 import androidx.loader.content.Loader;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -39,6 +40,8 @@ public class EarthquakeActivity extends AppCompatActivity
     @Override
     protected void onCreate( Bundle savedInstanceState )
     {
+        Log.i( LOG_TAG, "TEST: Earthquake Activity onCreate() called ..." );
+        
         super.onCreate( savedInstanceState );
         setContentView( R.layout.earthquake_activity );
         
@@ -73,6 +76,8 @@ public class EarthquakeActivity extends AppCompatActivity
     @Override
     public Loader< List< Earthquake > > onCreateLoader( int id, Bundle args )
     {
+        Log.i( LOG_TAG, "TEST: onCreateLoader() called ..." );
+        
         // COMPLETED: Create a new loader for the given URL
         return new EarthquakeLoader( this, USGS_REQUEST_URL );
     }
@@ -87,6 +92,8 @@ public class EarthquakeActivity extends AppCompatActivity
     @Override
     public void onLoadFinished( Loader< List< Earthquake > > loader, List< Earthquake > earthquakes )
     {
+        Log.i( LOG_TAG, "TEST: onLoadFinished() called ..." );
+        
         // COMPLETED: Update the UI with the result
         // Clear the adapter of previous earthquake data
         mAdapter.clear();
@@ -108,6 +115,8 @@ public class EarthquakeActivity extends AppCompatActivity
     @Override
     public void onLoaderReset( Loader< List< Earthquake > > loader )
     {
+        Log.i( LOG_TAG, "TEST: onLoaderReset() called ..." );
+        
         // COMPLETED: Loader reset, so we can clear out our existing data.
         // Clear the adapter of previous earthquake data
         mAdapter.clear();
