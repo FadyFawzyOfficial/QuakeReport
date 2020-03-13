@@ -7,6 +7,7 @@ import androidx.loader.content.Loader;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -108,6 +109,10 @@ public class EarthquakeActivity extends AppCompatActivity
     public void onLoadFinished( Loader< List< Earthquake > > loader, List< Earthquake > earthquakes )
     {
         Log.i( LOG_TAG, "TEST: onLoadFinished() called ..." );
+    
+        // Hide loading indicator because the data has been loaded
+        View loadingSpinner = findViewById( R.id.loading_spinner );
+        loadingSpinner.setVisibility( View.GONE );
         
         // Set empty state text to display "No earthquakes found."
         mEmptyStateTextView.setText( R.string.no_earthquakes );
