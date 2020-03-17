@@ -7,10 +7,12 @@ import androidx.loader.content.Loader;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,7 +36,7 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
      * URL for earthquake data from the USGS data set
      */
     private static final String USGS_REQUEST_URL =
-            "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=6&limit=10";
+            "https://earthquake.usgs.gov/fdsnws/event/1/query";
     
     /**
      * Constant value for the earthquake loader ID. We can choose any integer.
@@ -147,8 +149,22 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
     {
         Log.i( LOG_TAG, "TEST: onCreateLoader() called ..." );
         
-        // COMPLETED: Create a new loader for the given URL
-        return new EarthquakeLoader( this, USGS_REQUEST_URL );
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences( this );
+        String minMagnitude = sharedPreferences.getString(
+                getString( R.string.settings_min_magnitude_key ),
+                getString( R.string.settings_min_magnitude_default ) );
+        
+        Uri baseUri = Uri.parse( USGS_REQUEST_URL );
+        Uri.Builder uriBuilder = baseUri.buildUpon();
+        
+        uriBuilder.appendQueryParameter( "format", "geojson" );
+        uriBuilder.appendQueryParameter( "limit", "10" );
+        uriBuilder.appendQueryParameter( "minmag", minMagnitude );
+        uriBuilder.appendQueryParameter( "orderby", "time" );
+        
+        // Create a new loader for the the previous URL builder
+        return new EarthquakeLoader( this, uriBuilder.toString() );
     }
     
     /**
@@ -170,7 +186,7 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
         // Set empty state text to display "No earthquakes found."
         mEmptyStateTextView.setText( R.string.no_earthquakes );
         
-        // COMPLETED: Update the UI with the result
+        // Update the UI with the result
         // Clear the adapter of previous earthquake data
         mAdapter.clear();
         
@@ -193,7 +209,7 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
     {
         Log.i( LOG_TAG, "TEST: onLoaderReset() called ..." );
         
-        // COMPLETED: Loader reset, so we can clear out our existing data.
+        // Loader reset, so we can clear out our existing data.
         // Clear the adapter of previous earthquake data
         mAdapter.clear();
     }
