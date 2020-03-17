@@ -1,8 +1,10 @@
 package com.engineerfadyfawzi.quakereport;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -31,11 +33,11 @@ public class SettingsActivity extends AppCompatActivity
             super.onCreate( savedInstanceState );
             addPreferencesFromResource( R.xml.settings_main );
             
+            // Update the preference summary when the settings activity is launched.
             // Use PreferenceFragment's findPreference() method to get the Preference object, and
             Preference minMagnitude = findPreference( getString( R.string.settings_min_magnitude_key ) );
-            // Sets the callback to be invoked when this Preference is changed by the user (but before
-            // the internal state has been updated).
-            minMagnitude.setOnPreferenceChangeListener( this );
+            // setup the preference using this helper method.
+            bindPreferenceSummaryToValue( minMagnitude );
         }
         
         /**
@@ -55,6 +57,28 @@ public class SettingsActivity extends AppCompatActivity
             String stringValue = value.toString();
             preference.setSummary( stringValue );
             return true;
+        }
+        
+        /**
+         * Set the current EarthquakePreferenceFragment instance as the listener on each preference.
+         * We also read the current value of the preference stored in the SharedPreferences on
+         * the device, and display that in the preference summary (so that the user can see the
+         * current value of the preference).
+         *
+         * @param preference that will show or update it's value
+         */
+        private void bindPreferenceSummaryToValue( Preference preference )
+        {
+            // Sets the callback to be invoked when this Preference is changed by the user (but before
+            // the internal state has been updated).
+            preference.setOnPreferenceChangeListener( this );
+            SharedPreferences sharedPreferences =
+                    PreferenceManager.getDefaultSharedPreferences( preference.getContext() );
+            // getString: returns the preference value if it exists, or default value which is the
+            // second argument of this method (Value to return if this preference does not exist).
+            String preferenceString = sharedPreferences.getString( preference.getKey(), "" );
+            // To display the preference summary on Activity launched.
+            onPreferenceChange( preference, preferenceString );
         }
     }
 }
