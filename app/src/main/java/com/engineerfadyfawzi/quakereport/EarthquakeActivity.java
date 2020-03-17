@@ -140,6 +140,9 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
      * We need onCreateLoader(), for when the LoaderManager has determined that the loader with our
      * specified ID isn't running, so we should create a new one.
      *
+     * We need to look up the user's preferred minimum magnitude and sort order when we build
+     * the URI for making the HTTP request.
+     *
      * @param id
      * @param args
      * @return
@@ -149,11 +152,17 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
     {
         Log.i( LOG_TAG, "TEST: onCreateLoader() called ..." );
         
+        // Read from SharedPreferences and check the value associated with the key.
         SharedPreferences sharedPreferences =
                 PreferenceManager.getDefaultSharedPreferences( this );
+        
         String minMagnitude = sharedPreferences.getString(
                 getString( R.string.settings_min_magnitude_key ),
                 getString( R.string.settings_min_magnitude_default ) );
+        
+        String orderBy = sharedPreferences.getString(
+                getString( R.string.settings_order_by_key ),
+                getString( R.string.settings_order_by_default ) );
         
         Uri baseUri = Uri.parse( USGS_REQUEST_URL );
         Uri.Builder uriBuilder = baseUri.buildUpon();
@@ -161,7 +170,7 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
         uriBuilder.appendQueryParameter( "format", "geojson" );
         uriBuilder.appendQueryParameter( "limit", "10" );
         uriBuilder.appendQueryParameter( "minmag", minMagnitude );
-        uriBuilder.appendQueryParameter( "orderby", "time" );
+        uriBuilder.appendQueryParameter( "orderby", orderBy );
         
         // Create a new loader for the the previous URL builder
         return new EarthquakeLoader( this, uriBuilder.toString() );
