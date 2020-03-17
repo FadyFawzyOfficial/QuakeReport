@@ -3,6 +3,7 @@ package com.engineerfadyfawzi.quakereport;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SettingsActivity extends AppCompatActivity
@@ -16,6 +17,11 @@ public class SettingsActivity extends AppCompatActivity
     
     public static class EarthquakePreferenceFragment extends PreferenceFragment
     {
-    
+        @Override
+        public void onCreate( Bundle savedInstanceState )
+        {
+            super.onCreate( savedInstanceState );
+            addPreferencesFromResource( R.xml.settings_main );
+        }
     }
 }
