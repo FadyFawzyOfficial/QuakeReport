@@ -89,10 +89,22 @@ public class EarthquakeActivity extends AppCompatActivity
         // construct a proper URI with their preference, and then
         // create a new Loader for that URI.
         
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences( this );
+        // Read from SharedPreferences and check the value associated with the key.
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences( this );
+        
+        // SharedPreferences class's getString method: returns the preference value if it exists,
+        // or default value which is the second argument of this method
+        // (Value to return if this preference does not exist).
+        
         String minMagnitude = sharedPreferences.getString(
                 getString( R.string.settings_min_magnitude_key ),
                 getString( R.string.settings_min_magnitude_default ) );
+        
+        String orderBy = sharedPreferences.getString(
+                getString( R.string.settings_order_by_key ),
+                getString( R.string.settings_order_by_default ) );
+        
         
         Uri baseUri = Uri.parse( USGS_REQUEST_URL );
         Uri.Builder uriBuilder = baseUri.buildUpon();
@@ -100,9 +112,9 @@ public class EarthquakeActivity extends AppCompatActivity
         uriBuilder.appendQueryParameter( "format", "geojson" );
         uriBuilder.appendQueryParameter( "limit", "10" );
         uriBuilder.appendQueryParameter( "minmag", minMagnitude );
-        uriBuilder.appendQueryParameter( "orderby", "time" );
+        uriBuilder.appendQueryParameter( "orderby", orderBy );
         
-        // Create a new loader for the previous URL built
+        // Create a new loader for the previous URL builder
         return new EarthquakeLoader( this, uriBuilder.toString() );
     }
     
