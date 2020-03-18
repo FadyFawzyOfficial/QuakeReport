@@ -24,7 +24,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EarthquakeActivity extends AppCompatActivity implements LoaderCallbacks< List< Earthquake > >
+public class EarthquakeActivity extends AppCompatActivity implements
+        LoaderCallbacks< List< Earthquake > >,
+        SharedPreferences.OnSharedPreferenceChangeListener
 {
     /**
      * Tag for log messages
@@ -80,6 +82,13 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
         // Set the adapter on the {@link ListView}
         // so the list can be populated in the user interface
         earthquakeListView.setAdapter( mAdapter );
+        
+        // Obtain a reference to the SharedPreferences file for the app
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences( this );
+        
+        // And register to be notified of preference changes
+        // So we know when the user has adjusted the query settings
+        sharedPreferences.registerOnSharedPreferenceChangeListener( this );
         
         // set an item click listener on the ListView, which sends an intent to a web browser
         // to open a website with more information about the selected earthquake.
@@ -243,5 +252,34 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
         }
         
         return super.onOptionsItemSelected( item );
+    }
+    
+    /**
+     * Called when a shared preference is changed, added, or removed.
+     * This may be called even if a preference is set to its existing value.
+     * This callback will be run on your main thread (UI thread).
+     *
+     * @param sharedPreferences The SharedPreferences that received the change.
+     * @param preferenceKey The key of the preference that was changed, added, or removed.
+     */
+    @Override
+    public void onSharedPreferenceChanged( SharedPreferences sharedPreferences, String preferenceKey )
+    {
+        if ( preferenceKey.equals( getString( R.string.settings_min_magnitude_key ) ) ||
+                preferenceKey.equals( getString( R.string.settings_order_by_key ) ) )
+        {
+            // Clear the ListView as a new query will be kicked off
+            mAdapter.clear();
+            
+            // Hide the empty state text view as teh loading indicator will be displayed
+            mEmptyStateTextView.setVisibility( View.GONE );
+            
+            // Show the loading indicator while new data is being fetched
+            View loadingSpinner = findViewById( R.id.loading_spinner );
+            loadingSpinner.setVisibility( View.VISIBLE );
+            
+            // Restart the loader to re-query the USGS as thq query settings have been updated
+            getSupportLoaderManager().restartLoader( EARTHQUAKE_LOADER_ID, null, this );
+        }
     }
 }
