@@ -173,6 +173,8 @@ public class EarthquakeActivity extends AppCompatActivity implements
     @Override
     public boolean onCreateOptionsMenu( Menu menu )
     {
+        // Inflate the menu options from the res/menu/main.xml file.
+        // This adds menu items to the app bar.
         getMenuInflater().inflate( R.menu.main, menu );
         return true;
     }
